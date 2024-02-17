@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Message Frontend</title>
+    <!-- Add Tailwind CSS via CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold mb-4">Message Frontend</h1>
+
+    <!-- Form to send a message -->
+    <form id="sendMessageForm" class="mb-4">
+      <label for="messageInput" class="block text-sm font-medium text-gray-700"
+        >Message:</label
+      >
+      <input
+        type="text"
+        id="messageInput"
+        class="mt-1 p-2 border rounded-md w-full"
+        required
+      />
+      <button
+        type="submit"
+        class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+      >
+        Send Message
+      </button>
+    </form>
+
+    <!-- Display messages -->
+    <div id="messageList" class="bg-white p-4 rounded-md">
+      <!-- Message content will be displayed here -->
+    </div>
+
+    <script>
+      // Function to send a message
+      async function sendMessage(message) {
+        const response = await fetch(
+          `/send?message=${encodeURIComponent(message)}`
+        );
+        const result = await response.json();
+        console.log(result);
+
+        // Reload messages after sending a new message
+        fetchMessages();
+      }
+
+      // Function to fetch and display messages
+      async function fetchMessages() {
+        const response = await fetch("/messages");
+        const messages = await response.json();
+
+        // Display messages in reverse order in the messageList div
+        const messageList = document.getElementById("messageList");
+        messageList.innerHTML = "";
+
+        const peerComponent = (peer_id) => {
+          const component = document.createElement("strong");
+          component.textContent = peer_id;
+          return component;
+        };
+
+        const messageComponent = (message) => {
+          const component = document.createElement("p");
+          component.textContent = message;
+          return component;
+        };
+
+        const timestampComponent = (timestamp) => {
+          const component = document.createElement("i");
+          component.classList.add("text-xs", "text-gray-500");
+          component.textContent = timestamp;
+          return component;
+        };
+
+        const messageIds = Object.keys(messages).reverse();
+        for (const messageId of messageIds) {
+          const message = messages[messageId];
+
+          const messageElement = document.createElement("div");
+          messageElement.innerHTML =
+            " <strong>" +
+            message.peer_id +
+            "</strong>: " +
+            message.message +
+            " <i class='text-gray-300'>" +
+            messageId +
+            "</i>";
+          messageList.appendChild(messageElement);
+        }
+      }
+      const messageElement = document.createElement("div");
+
+      // Attach event listener to the form for sending messages
+      document
+        .getElementById("sendMessageForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const messageInput = document.getElementById("messageInput");
+          const message = messageInput.value.trim();
+
+          if (message) {
+            sendMessage(message);
+            messageInput.value = "";
+          }
+        });
+
+      // Fetch and display messages on page load
+      fetchMessages();
+
+      // Reload messages every three seconds
+      setInterval(fetchMessages, 3000);
+    </script>
+  </body>
+</html>
