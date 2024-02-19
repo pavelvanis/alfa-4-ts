@@ -1,6 +1,6 @@
-# Decentralizovaný Peer-to-Peer Chat
+# Peer-to-Peer Chat
 
-Tento projekt implementuje decentralizovaný chatovací systém mezi různými uzly (peery) pomocí UDP, TCP a HTTP protokolů. Každý uzel se může připojit k síti, najít ostatní uzly a komunikovat s nimi prostřednictvím textových zpráv.
+Tento projekt implementuje chatovací systém mezi různými peery pomocí UDP, TCP. Každý uzel se může připojit k síti, najít ostatní uzly a komunikovat s nimi. Aplikace umožnuje dostávat i posílat pomocí pomocí webové rozhraní a API.
 
 ## Instalace a Spuštění
 
