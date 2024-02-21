@@ -11,5 +11,5 @@
   "timeouts": {
     "tcp_timeout": 30000
   },
-  "my_peer_id": "default-peer"
+  "max_message_history": 100
 }

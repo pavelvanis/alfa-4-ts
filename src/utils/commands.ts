@@ -6,23 +6,27 @@ import {
   NewMessageType,
   OkMessageType,
 } from "../types/commands";
-import config from "../../config.json";
 import { GetMessages } from "../data/message-history";
+import my_peer_id from "../data/peer-id";
+
+function stringifyCommand(command: any) {
+  return JSON.stringify(command);
+}
 
 export function OkMessageCmd() {
   const command: OkMessageType = {
     status: "ok",
-    peer_id: config.my_peer_id,
+    peer_id: my_peer_id,
   };
-  return JSON.stringify(command);
+  return stringifyCommand(command);
 }
 
 export function HelloMessageCmd() {
   const command: HelloMessageType = {
     command: "hello",
-    peer_id: config.my_peer_id,
+    peer_id: my_peer_id,
   };
-  return JSON.stringify(command);
+  return stringifyCommand(command);
 }
 
 export function MessagesHistoryCmd() {
@@ -30,7 +34,7 @@ export function MessagesHistoryCmd() {
     status: "ok",
     messages: GetMessages(),
   };
-  return JSON.stringify(command);
+  return stringifyCommand(command);
 }
 
 export function NewMessageCmd({ ...props }: NewMessageProps) {
@@ -38,14 +42,14 @@ export function NewMessageCmd({ ...props }: NewMessageProps) {
     command: "new_message",
     ...props,
   };
-  return JSON.stringify(command);
+  return stringifyCommand(command);
 }
 
 export function NewMessageOkCmd() {
   const command: NewMessageOkType = {
     status: "ok",
   };
-  return JSON.stringify(command);
+  return stringifyCommand(command);
 }
 
 export function BufferedMessage(message: string): Buffer {

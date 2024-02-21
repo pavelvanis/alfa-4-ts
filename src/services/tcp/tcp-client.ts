@@ -13,63 +13,81 @@ type Client = {
   lastMessage: number;
 };
 
+/**
+ * Store for active clients
+ */
 export let activeClients: Record<string, Client> = {};
 
+/**
+ * Handles a TCP client by establishing a connection and setting up event listeners.
+ * 
+ * @param response - The response from the client
+ * @param address - The address of the client
+ */
 export const handleTCPClient = (response: any, address: string) => {
   const { peer_id } = response;
 
-  // When exist active connection update and return
+  // If there's already an active connection, return
   if (activeClients[peer_id]) {
-    activeClients[peer_id].lastMessage = Date.now();
     return;
   }
 
+  // Create a new connection
   const client = net.createConnection({ port: tcp_port, host: address }, () => {
-    logTcpClient(`TCP connection with ${peer_id} established.`);
     client.write(BufferedMessage(HelloMessageCmd()));
-    activeClients[peer_id] = {
-      socket: client,
-      lastMessage: Date.now(),
-    };
+    logTcpClient(`Hello message to ${peer_id} sent`);
   });
 
-  const responseTimeout = setTimeout(() => {
-    logTcpClient(
-      `No response from ${peer_id} within 30 seconds. Disconnecting.`
-    );
-    client.end();
-    delete activeClients[peer_id];
-  }, tcp_timeout);
-
+  // Handle incoming data
   client.on("data", (data) => {
     try {
-      clearTimeout(responseTimeout);
       const response = JSON.parse(data.toString());
       const { status, messages } = response;
 
+      // If the status is "ok", merge the messages
       if (status === "ok") {
         logTcpClient(`OK from ${peer_id}`);
         MergeMessages(messages);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   });
 
+  // Handle connection
+  client.on("connect", () => {
+    activeClients[peer_id] = {
+      socket: client,
+      lastMessage: Date.now(),
+    };
+    logTcpClient(`Connection with ${peer_id} is established`);
+  });
+
+  // Handle connection closure
   client.on("close", () => {
     logTcpClient(`TCP connection with ${peer_id} closed.`);
     delete activeClients[peer_id];
   });
 
+  // Handle errors
   client.on("error", (err: any) => {
-    if (err.code === "ECONNRESET") {
-      logTcpClient("TCP connection reset by peer");
+    if (err.code === "ETIMEDOUT") {
+      const peer = err.address;
+      logTcpClient(`${peer} was removed due to ETIMEDOUT error`);
+      client.destroy();
+      delete activeClients[peer_id];
     } else {
       logTcpClient("Socket error:", err);
     }
   });
 };
 
+/**
+ * Logs a message to the console with a "TCP: CLIENT:" prefix.
+ * 
+ * @param text - The main text to log
+ * @param args - Additional data to log
+ */
 function logTcpClient(text: string, args?: any) {
   console.log("TCP: CLIENT:", text, args ? args : "");
 }
