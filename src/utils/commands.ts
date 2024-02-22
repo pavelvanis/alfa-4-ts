@@ -1,4 +1,5 @@
 import {
+  ErrorResponseType,
   HelloMessageType,
   MessagesHistoyType,
   NewMessageOkType,
@@ -76,6 +77,19 @@ export function NewMessageOkCmd() {
     status: "ok",
   };
   return stringifyCommand(command);
+}
+
+/**
+ * Function to create an error response command
+ * @param {string} message - The error message
+ * @returns {string} - The stringified error response command
+ */
+export function ErrorResponseCmd(message: string) {
+  const command: ErrorResponseType = {
+    status: "error",
+    error: message,
+  };
+  return JSON.stringify(command);
 }
 
 /**

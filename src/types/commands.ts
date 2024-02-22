@@ -41,6 +41,14 @@ export type NewMessageOkType = {
 };
 
 /**
+ * Type for a "error" response with error message
+ */
+export type ErrorResponseType = {
+  status: "error",
+  error: string
+}
+
+/**
  * Type for a message history response.
  */
 export type MessagesHistoyType = {

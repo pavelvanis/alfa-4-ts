@@ -20,7 +20,7 @@ export let activeClients: Record<string, Client> = {};
 
 /**
  * Handles a TCP client by establishing a connection and setting up event listeners.
- * 
+ *
  * @param response - The response from the client
  * @param address - The address of the client
  */
@@ -50,6 +50,13 @@ export const handleTCPClient = (response: any, address: string) => {
         MergeMessages(messages);
       }
     } catch (error) {
+      if (error instanceof SyntaxError) {
+        return client.write(
+          BufferedMessage(
+            JSON.stringify({ status: "error", error: "Invalid command" })
+          )
+        );
+      }
       console.error(error);
     }
   });
@@ -84,7 +91,7 @@ export const handleTCPClient = (response: any, address: string) => {
 
 /**
  * Logs a message to the console with a "TCP: CLIENT:" prefix.
- * 
+ *
  * @param text - The main text to log
  * @param args - Additional data to log
  */
