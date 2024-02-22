@@ -1,33 +1,34 @@
 # Peer-to-Peer Chat
 
-Tento projekt implementuje chatovací systém mezi různými peery pomocí UDP, TCP. Každý uzel se může připojit k síti, najít ostatní uzly a komunikovat s nimi. Aplikace umožnuje dostávat i posílat pomocí pomocí webové rozhraní a API.
+This project implements a chat system between different peers using UDP, TCP. Each node can connect to the network, discover other nodes, and communicate with them. The application allows receiving and sending messages through a web interface and API.
 
-## Instalace a Spuštění
+## Installation and Running
 
-1. **Instalace závislostí:**
+1. **Install Dependencies:**
 
-   - Nainstalujte Node.js a npm z [Node.js stránky](https://nodejs.org/).
-   - Naklonujte si tento repozitář na svůj počítač.
+- Install Node.js and npm from the [Node.js website](https://nodejs.org/).
+- Clone this repository to your computer.
 
-2. **Instalace npm balíčků**
+2. **Install npm Packages**
 
-   - Přejděte do adresáře projektu a pomocí `npm i` nainstalujte všechny potřebné balíčky
+- Navigate to the project directory and run `npm i` to install all necessary packages.
 
-3. **Konfigurace:**
+3. **Configuration:**
 
-   - Nastavte konfigurační soubor `config.json` podle vašich potřeb.
+- Set up the configuration file `config.json` according to your needs.
 
-4. **Spouštění:**
+4. **Running:**
 
-   - Otevřete terminál a přejděte do adresáře s projektem.
-   - Spusťte aplikaci pomocí příkazu `npm start`.
+- Open a terminal and navigate to the project directory.
+- Start the application with the command `npm start`.
 
-5. **Spuštění pomocí service**
-   - pokud chcete spustit aplikaci jako service na Debian, vytvořte v `/etc/systemd/system` soubor `chat.service` a upravte jej aby vypadal podle kódu níže, kde nahradíte `user` za uživatele pod kterým chcete spouštět service a `WorkingDirectory` kde použijete cestu k vašemu projektu
-   - spusťte příkaz `sudo systemctl daemon-reload`, který znovu načte konfiguraci systémového démona
-   - pak můžete použít příkaz `sudo systemctl start chat` pro spuštění a `sudo journalctl -fu chat` k zobrazení logů
+5. **Running as a Service**
 
-**soubor pro konfiguraci _chat.service_:**
+- If you want to run the application as a service on Debian, create a `chat.service` file in `/etc/systemd/system` and modify it to look like the code below, replacing `user` with the user under which you want to run the service and `WorkingDirectory` with the path to your project.
+- Run the command `sudo systemctl daemon-reload` to reload the systemd daemon configuration.
+- Then you can use `sudo systemctl start chat` to start the service and `sudo journalctl -fu chat` to view the logs.
+
+###### Configuration file _chat.service_:
 
 ```ini
 [Unit]
@@ -44,43 +45,37 @@ Environment=NODE_ENV=production
 WantedBy=multi-user.target
 ```
 
-## Použití
+## Usage
 
 ### 1. UDP Discovery
 
-- Po spuštění aplikace se uzel automaticky připojí k síti a bude pravidelně odesílat UDP Discovery pro objevení ostatních uzlů.
-- Odpovědi na tyto dotazy budou obsahovat seznam dostupných uzlů v síti.
+- Upon starting the application, a node automatically connects to the network and regularly sends UDP Discovery messages to discover other nodes.
+- Responses to these queries will contain a list of available nodes in the network.
 
-### 2. TCP Protokol
+### 2. TCP Protocol
 
-- Po nalezení jiných uzlů přes UDP, uzel naváže trvalé TCP spojení s každým z nich a uloží si ho.
-- Při navázání spojení provede handshake a obdrží historii zpráv od protějšku.
-- Poté může posílat a přijímat zprávy pomocí TCP spojení.
-- Zároveň se vytvoří TCP server, který bude naslouchat a na příchozí handshake vrátí všechny svoje zprávy
+- After discovering other nodes via UDP, a node establishes a persistent TCP connection with each of them and saves it.
+- Upon establishing a connection, it performs a handshake and receives message history from the peer.
+- It can then send and receive messages using TCP connections.
+- Additionally, a TCP server is created to listen, and upon incoming handshake, it returns all its messages.
 
-### 3. Webové API
+### 3. Web API
 
-- Aplikace poskytuje jednoduché HTTP API a rozhraní pro čtení a zasílání zpráv.
-- `GET /messages` - vrátí všechny zprávy v json
-- `GET /send?message=<text>` - pošle zprávu, kde
-- `GET /` - jednoduché rozhraní pro posílání a zobrazení zpráv
+- The application provides a simple HTTP API and interface for reading and sending messages.
+- `GET /messages` - returns all messages in json format.
+- `GET /send?message=<text>` - sends a message, where
+- `GET /` - a simple interface for sending and displaying messages.
 
-## Příklad použití
+## Additional Information
 
-1. Spusťte aplikaci na každém uzlu v síti.
-2. Připojte se k jednomu z uzlů pomocí webového prohlížeče nebo nástroje jako `curl`.
-3. Pošlete zprávu na jeden uzel a sledujte, jak se šíří přes ostatní uzly v síti.
-4. Prohlížejte si historii zpráv pomocí webového rozhraní nebo API.
+- The project is implemented in Typescript and runs on Node.js.
+- Express.js is used for the web API.
+- Each peer has a unique ID, which can be set in `config.json` as `my_peer_id`.
+- Messages are identified using timestamps.
+- An array in RAM is used for storing message history.
+- The application logs events and errors using system logging.
+- All non-original content can be found in `/src/vendor`.
 
-## Další Informace
+## License
 
-- Projekt je implementován v jazyce Node.js.
-- Pro webové API je použit Express.js
-- Každý uzel má své unikátní ID, které jde nastavit v config.json jako `my_peer_id`
-- Zprávy jsou identifikovány pomocí timestampů.
-- Pro ukládání historie zpráv se využívá pole v paměti RAM.
-- Aplikace loguje události a chyby pomocí systémového logování.
-
-## Licence
-
-Tento projekt je licencován pod MIT licencí. Podrobnosti naleznete v souboru [LICENSE](LICENSE).
+This project is licensed under the MIT License. Details can be found in the [LICENSE](LICENSE) file.
