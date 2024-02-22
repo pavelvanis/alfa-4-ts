@@ -30,7 +30,9 @@ udpServer.on("message", (msg, rinfo) => {
   // Ignore messages from self
   if (peer_id === my_peer_id) return;
 
-  logudp(`Received from ${rinfo.address} - ${msg.toString()}`);
+  logudp(
+    `Received from (${peer_id}) ${rinfo.address} - ${msg.toString().trim()}`
+  );
 
   // If the status is "ok", handle TCP connections
   if (status === "ok") {

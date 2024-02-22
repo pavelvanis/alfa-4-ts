@@ -1,6 +1,10 @@
 import net from "net";
 import config from "../../../config.json";
-import { BufferedMessage, HelloMessageCmd } from "../../utils/commands";
+import {
+  BufferedMessage,
+  ErrorResponseCmd,
+  HelloMessageCmd,
+} from "../../utils/commands";
 import { MergeMessages } from "../../data/message-history";
 
 const {
@@ -46,15 +50,17 @@ export const handleTCPClient = (response: any, address: string) => {
 
       // If the status is "ok", merge the messages
       if (status === "ok") {
-        logTcpClient(`OK from ${peer_id}`);
+        logTcpClient(
+          `Recieved messages from (${peer_id}) - [${
+            Object.keys(messages).length
+          }x]`
+        );
         MergeMessages(messages);
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
         return client.write(
-          BufferedMessage(
-            JSON.stringify({ status: "error", error: "Invalid command" })
-          )
+          BufferedMessage(ErrorResponseCmd("Invalid command"))
         );
       }
       console.error(error);
@@ -63,6 +69,7 @@ export const handleTCPClient = (response: any, address: string) => {
 
   // Handle connection
   client.on("connect", () => {
+    // Add connection to active clients
     activeClients[peer_id] = {
       socket: client,
       lastMessage: Date.now(),

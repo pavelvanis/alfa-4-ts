@@ -1,6 +1,6 @@
 import net from "net";
 import { activeClients } from "./tcp-client";
-import { SaveMessage } from "../../data/message-history";
+import { GetMessages, SaveMessage } from "../../data/message-history";
 import {
   BufferedMessage,
   ErrorResponseCmd,
@@ -23,7 +23,11 @@ export const tcpServer = net.createServer((socket) => {
 
       if (command === "hello" && peer_id) {
         socket.write(BufferedMessage(MessagesHistoryCmd()));
-        logTcpServer(`Sent messages to ${response.peer_id}`);
+        logTcpServer(
+          `Sent messages to (${response.peer_id}) - [${
+            Object.keys(GetMessages()).length
+          }x]`
+        );
         // Add peer_id to active clients
         return;
       }
@@ -41,16 +45,17 @@ export const tcpServer = net.createServer((socket) => {
         } else {
           socket.write(
             BufferedMessage(
-              JSON.stringify({ status: "error", error: "Make TCP handshake before this command" })
+              JSON.stringify({
+                status: "error",
+                error: "Make TCP handshake before this command",
+              })
             )
           );
           logTcpServer("Peer not found for IP:", ip);
         }
         return;
       }
-      socket.write(
-        BufferedMessage(ErrorResponseCmd("Invalid comand"))
-      );
+      socket.write(BufferedMessage(ErrorResponseCmd("Invalid comand")));
     } catch (error) {
       if (error instanceof SyntaxError) {
         return socket.write(

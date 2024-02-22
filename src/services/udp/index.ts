@@ -1,4 +1,3 @@
-import dgram from "dgram";
 import { activeClients } from "../tcp/tcp-client";
 import { HelloMessageCmd } from "../../utils/commands";
 import config from "../../../config.json";
@@ -19,10 +18,11 @@ export default function udp(): void {
 
     // Regular broadcasts at the specified interval
     setInterval(() => {
+      let clients = Object.keys(activeClients);
       sendBroadcast();
       console.log(
-        `Active TCP connections with: ${JSON.stringify(
-          Object.keys(activeClients)
+        `Active TCP connections (${clients.length}) with: ${JSON.stringify(
+          clients
         )}`
       );
     }, interval);
