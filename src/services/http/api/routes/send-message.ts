@@ -1,14 +1,17 @@
 import { Request, Response } from "express";
-import { SaveMessage } from "../../../../data/message-history";
+import { GetMessages, SaveMessage } from "../../../../data/message-history";
 import { SaveMessageProps } from "../../../../types/messages";
 import { activeClients } from "../../../tcp/tcp-client";
 import { BufferedMessage, NewMessageCmd } from "../../../../utils/commands";
-import my_peer_id from "../../../../data/peer-id";
+import settings from "../../../../utils/settings";
+import logger from "../../../../utils/logger";
+
+const { my_peer_id } = settings;
 
 /**
  * MessagesRoute is an Express middleware function that handles incoming requests to send messages.
  * It first validates the message, then saves it and sends it to all active clients.
- * 
+ *
  * @param req - The incoming HTTP request
  * @param res - The outgoing HTTP response
  * @returns - The function doesn't return anything. Instead, it calls `res.json()` to send a response to the client.
@@ -18,6 +21,7 @@ export default function MessagesRoute(req: Request, res: Response) {
 
   // Return error when message is not set
   if (!message) {
+    logger.error("HTTP", `(HTTP) [GET /message?send] -  message is missing`);
     return res.json({ status: "error", message: "Message is missing" });
   }
 
@@ -39,7 +43,10 @@ export default function MessagesRoute(req: Request, res: Response) {
       NewMessageCmd({ message, message_id: timestamp })
     );
     client.socket.write(bufferedMessage);
-    console.log(`new message sent to ${peer_id}`);
+    logger.send(
+      "HTTP",
+      `(HTTP) [GET /message?send] -  new message sent to ${peer_id}`
+    );
   }
 
   res.json({ status: "ok" });

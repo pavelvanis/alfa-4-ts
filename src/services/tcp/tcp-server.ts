@@ -1,5 +1,5 @@
 import net from "net";
-import { activeClients } from "./tcp-client";
+import { activeClients, handleTCPClient } from "./tcp-client";
 import { GetMessages, SaveMessage } from "../../data/message-history";
 import {
   BufferedMessage,
@@ -7,6 +7,7 @@ import {
   MessagesHistoryCmd,
   NewMessageOkCmd,
 } from "../../utils/commands";
+import logger from "../../utils/logger";
 
 /**
  * The TCP server that handles incoming connections and data from clients.
@@ -23,12 +24,14 @@ export const tcpServer = net.createServer((socket) => {
 
       if (command === "hello" && peer_id) {
         socket.write(BufferedMessage(MessagesHistoryCmd()));
-        logTcpServer(
+        logger.send(
+          "TCP",
           `Sent messages to (${response.peer_id}) - [${
             Object.keys(GetMessages()).length
           }x]`
         );
         // Add peer_id to active clients
+        handleTCPClient(response, socket.remoteAddress.split(":").pop());
         return;
       }
 
@@ -40,6 +43,7 @@ export const tcpServer = net.createServer((socket) => {
         );
 
         if (peer_id) {
+          // Save message and send "ok"
           SaveMessage({ peer_id, message, message_id });
           socket.write(BufferedMessage(NewMessageOkCmd()));
         } else {
@@ -51,7 +55,7 @@ export const tcpServer = net.createServer((socket) => {
               })
             )
           );
-          logTcpServer("Peer not found for IP:", ip);
+          logger.error("TCP", `Peer not found for IP: ${ip}`);
         }
         return;
       }
@@ -64,25 +68,19 @@ export const tcpServer = net.createServer((socket) => {
           )
         );
       }
-      console.error(error);
+      logger.error("TCP", error);
     }
   });
 
   socket.on("error", (err: any) => {
     if (err.code === "ECONNRESET") {
-      logTcpServer("TCP connection reset by peer");
+      const ip = socket.remoteAddress?.split(":").pop();
+      const peer = Object.keys(activeClients).find(
+        (key) => activeClients[key].socket.remoteAddress == ip
+      );
+      logger.error("TCP", `Connection with was reset by ${peer} - ip`);
     } else {
-      logTcpServer("Socket error:", err);
+      logger.error("TCP", err);
     }
   });
 });
-
-/**
- * Logs a message to the console with a "TCP: SERVER:" prefix.
- *
- * @param text - The main text to log
- * @param args - Additional data to log
- */
-function logTcpServer(text: string, args?: any) {
-  console.log("TCP: SERVER:", text, args ? args : "");
-}

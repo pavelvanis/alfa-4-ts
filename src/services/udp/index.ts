@@ -1,12 +1,14 @@
 import { activeClients } from "../tcp/tcp-client";
 import { HelloMessageCmd } from "../../utils/commands";
-import config from "../../../config.json";
 import { udpServer } from "./udp-server";
+import settings from "../../utils/settings";
+import logger from "../../utils/logger";
 
 const {
+  network: { broadcast },
+  broadcast_interval,
   ports: { udp_port },
-  broadcast: { interval, address },
-} = config;
+} = settings;
 
 /**
  * Starts the UDP server and sets up broadcasting.
@@ -20,12 +22,13 @@ export default function udp(): void {
     setInterval(() => {
       let clients = Object.keys(activeClients);
       sendBroadcast();
-      console.log(
+      logger.success(
+        "UDP",
         `Active TCP connections (${clients.length}) with: ${JSON.stringify(
           clients
         )}`
       );
-    }, interval);
+    }, broadcast_interval);
   });
 }
 
@@ -39,10 +42,10 @@ function sendBroadcast(): void {
     0,
     helloMessage.length,
     udp_port,
-    address,
+    broadcast,
     (err) => {
       if (err) console.error(err);
-      console.log(`Sent UDP Discovery every ${interval}ms`);
+      logger.send("UDP", `Sent UDP Discovery every ${broadcast_interval}ms`);
     }
   );
 }

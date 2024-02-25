@@ -1,9 +1,11 @@
 import express from "express";
-import config from "../../../config.json";
 import api from "./api";
+import settings from "../../utils/settings";
+import logger from "../../utils/logger";
 
-// Destructure the ports from the config
-const { ports } = config;
+const {
+  ports: { http_port },
+} = settings;
 
 /**
  * Initializes and starts the HTTP server.
@@ -19,7 +21,7 @@ export default function http(): void {
   api(app);
 
   // Start the server
-  app.listen(ports.http_port, () => {
-    console.log(`HTTP server is listening on port ${ports.http_port}`);
+  app.listen(http_port, () => {
+    logger.success("HTTP", `listening on port ${http_port}`);
   });
 }

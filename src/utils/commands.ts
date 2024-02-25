@@ -8,14 +8,17 @@ import {
   OkMessageType,
 } from "../types/commands";
 import { GetMessages } from "../data/message-history";
-import my_peer_id from "../data/peer-id";
+
+import setting from "./settings";
+
+const { my_peer_id } = setting;
 
 /**
  * Function to convert a command object to a JSON string
  * @param {any} command - The command object to stringify
  * @returns {string} - The stringified command
  */
-function stringifyCommand(command: any) {
+function stringifyCommand(command: any): string {
   return JSON.stringify(command);
 }
 
@@ -23,7 +26,7 @@ function stringifyCommand(command: any) {
  * Function to create an "ok" message command
  * @returns {string} - The stringified "ok" message command
  */
-export function OkMessageCmd() {
+export function OkMessageCmd(): string {
   const command: OkMessageType = {
     status: "ok",
     peer_id: my_peer_id,

@@ -77,10 +77,10 @@
         messageList.innerHTML = "";
         const messageIds = Object.keys(messages).reverse();
         for (const messageId of messageIds) {
-          const message = messages[messageId];
+          const message = messages[messageId]
           const sanitizedMessage = escapeHtml(message.message);
           const messageElement = document.createElement("div");
-          messageElement.innerHTML = `<strong>${message.peer_id}</strong>: ${sanitizedMessage} <i class='text-gray-300'>${messageId}</i>`;
+          messageElement.innerHTML = `<strong>${message.peer_id ? message.peer_id : ""}</strong>: ${sanitizedMessage} <i class='text-gray-300'>${messageId}</i>`;
           messageList.appendChild(messageElement);
         }
       };

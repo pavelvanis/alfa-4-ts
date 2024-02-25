@@ -1,8 +1,11 @@
-import config from "../../../config.json";
+import logger from "../../utils/logger";
+import settings from "../../utils/settings";
 import { tcpServer } from "./tcp-server";
 
-// Destructure the TCP port from the config
-const { tcp_port } = config.ports;
+// Destructure the TCP port from the settigns
+const {
+  ports: { tcp_port },
+} = settings;
 
 /**
  * Starts the TCP server.
@@ -11,6 +14,6 @@ const { tcp_port } = config.ports;
  */
 export default function tcp(): void {
   tcpServer.listen(tcp_port, () => {
-    console.log(`TCP server is listening on port ${tcp_port}`);
+    logger.success("TCP", `listening on port ${tcp_port}`);
   });
 }

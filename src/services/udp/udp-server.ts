@@ -1,7 +1,11 @@
 import dgram from "dgram";
 import { handleTCPClient } from "../tcp/tcp-client";
 import { OkMessageCmd } from "../../utils/commands";
-import my_peer_id from "../../data/peer-id";
+
+import settings from "../../utils/settings";
+import logger from "../../utils/logger";
+
+const { my_peer_id } = settings;
 
 /**
  * UDP Server instance.
@@ -14,7 +18,7 @@ export const udpServer = dgram.createSocket("udp4");
  */
 udpServer.on("listening", () => {
   const address = udpServer.address();
-  logudp(`UDP server listening on ${address.address}:${address.port}`);
+  logger.success("UDP", `listening on ${address.address}:${address.port}`);
 });
 
 /**
@@ -30,7 +34,8 @@ udpServer.on("message", (msg, rinfo) => {
   // Ignore messages from self
   if (peer_id === my_peer_id) return;
 
-  logudp(
+  logger.receive(
+    "UDP",
     `Received from (${peer_id}) ${rinfo.address} - ${msg.toString().trim()}`
   );
 
@@ -52,16 +57,6 @@ udpServer.on("message", (msg, rinfo) => {
         if (err) console.error(err);
       }
     );
-    logudp(`Sent hello to ${peer_id}`);
+    logger.send("UDP", `Sent ok to ${peer_id}`);
   }
 });
-
-/**
- * Logs a message to the console with a "UDP: SERVER:" prefix.
- *
- * @param text - The main text to log
- * @param args - Additional data to log
- */
-function logudp(text: string, args?: any) {
-  console.log("UDP: SERVER:", text, args ? args : "");
-}

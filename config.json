@@ -1,15 +1,16 @@
 {
+  "my_peer_id": "",
   "ports": {
     "http_port": 8000,
     "udp_port": 9876,
     "tcp_port": 9876
   },
-  "broadcast": {
-    "interval": 5000,
-    "address": "172.31.255.255"
+  "network": {
+    "network_interface": "eth1",
+    "broadcast": "",
+    "ip": ""
   },
-  "timeouts": {
-    "tcp_timeout": 30000
-  },
+  "broadcast_interval": 5000,
+  "tcp_timeout":30000,
   "max_message_history": 100
 }
