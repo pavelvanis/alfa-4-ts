@@ -16,6 +16,7 @@ This project implements a chat system between different peers using UDP, TCP. Ea
 3. **Configuration:**
 
 - Set up the configuration file `config.json` according to your needs.
+- Your peer-id will be by default your name of device
 
 4. **Running:**
 
@@ -75,6 +76,7 @@ WantedBy=multi-user.target
 - An array in RAM is used for storing message history.
 - The application logs events and errors using system logging.
 - All non-original content can be found in `/src/vendor`.
+- All logs are placed in `/logs`
 
 ## License
 
