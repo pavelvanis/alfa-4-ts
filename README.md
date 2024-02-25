@@ -62,10 +62,17 @@ WantedBy=multi-user.target
 
 ### 3. Web API
 
-- The application provides a simple HTTP API and interface for reading and sending messages.
-- `GET /messages` - returns all messages in json format.
-- `GET /send?message=<text>` - sends a message, where
-- `GET /` - a simple interface for sending and displaying message.
+- Aplikace poskytuje jednoduché HTTP API a rozhraní pro čtení a zasílání zpráv.
+- `GET /messages` - vrátí všechny zprávy v json
+- `GET /send?message=<text>` - pošle zprávu, kde
+- `GET /` - jednoduché rozhraní pro posílání a zobrazení zpráv
+
+## Příklad použití
+
+1. Spusťte aplikaci na každém uzlu v síti.
+2. Připojte se k jednomu z uzlů pomocí webového prohlížeče nebo nástroje jako `curl`.
+3. Pošlete zprávu na jeden uzel a sledujte, jak se šíří přes ostatní uzly v síti.
+4. Prohlížejte si historii zpráv pomocí webového rozhraní nebo API.
 
 ## Additional Information
 
